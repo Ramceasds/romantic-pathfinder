@@ -8,6 +8,13 @@
       "when": 1791788411542,
       "tag": "0000_dating_app_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791788432957,
+      "tag": "0001_avatars_private_read",
+      "breakpoints": true
     }
   ]
 }
