@@ -14,13 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          profile_a: string
+          profile_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_a: string
+          profile_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_a?: string
+          profile_b?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_profile_a_fkey"
+            columns: ["profile_a"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_profile_b_fkey"
+            columns: ["profile_b"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          match_id: string
+          sender: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_fkey"
+            columns: ["sender"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number
+          bio: string
+          city: string
+          created_at: string
+          display_name: string
+          gender: string
+          id: string
+          interested_in: string
+          interests: string[]
+          is_demo: boolean
+          max_age: number
+          min_age: number
+          photo_url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          age: number
+          bio?: string
+          city?: string
+          created_at?: string
+          display_name: string
+          gender?: string
+          id?: string
+          interested_in?: string
+          interests?: string[]
+          is_demo?: boolean
+          max_age?: number
+          min_age?: number
+          photo_url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          age?: number
+          bio?: string
+          city?: string
+          created_at?: string
+          display_name?: string
+          gender?: string
+          id?: string
+          interested_in?: string
+          interests?: string[]
+          is_demo?: boolean
+          max_age?: number
+          min_age?: number
+          photo_url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      swipes: {
+        Row: {
+          created_at: string
+          id: string
+          liked: boolean
+          swiper: string
+          target: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          liked: boolean
+          swiper: string
+          target: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          liked?: boolean
+          swiper?: string
+          target?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "swipes_swiper_fkey"
+            columns: ["swiper"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "swipes_target_fkey"
+            columns: ["target"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      my_profile_id: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
