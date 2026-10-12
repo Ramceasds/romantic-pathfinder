@@ -66,7 +66,7 @@ export function FilterSheet({ open, onOpenChange, profile, saving, onSave }: Pro
           <Button
             size="lg"
             disabled={saving}
-            onClick={() => onSave({ interested_in: interestedIn, min_age: range[0], max_age: range[1] })}
+            onClick={() => onSave({ interested_in: interestedIn, min_age: range[0] ?? 18, max_age: range[1] ?? 80 })}
             className="h-14 w-full rounded-full bg-gradient-primary text-base shadow-glow"
           >
             Apply filters

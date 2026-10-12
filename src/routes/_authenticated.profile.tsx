@@ -92,9 +92,13 @@ function ProfilePage() {
     e.preventDefault();
     if (!user) return;
     const ageNum = Number(age);
-    if (!name.trim()) return toast.error("Please add your name");
+    if (!name.trim()) {
+      toast.error("Please add your name");
+      return;
+    }
     if (!Number.isInteger(ageNum) || ageNum < 18 || ageNum > 99) {
-      return toast.error("You must be 18 or older to join");
+      toast.error("You must be 18 or older to join");
+      return;
     }
     setSaving(true);
     const payload = {
@@ -111,7 +115,10 @@ function ProfilePage() {
       ? await supabase.from("profiles").update(payload).eq("id", profile.id)
       : await supabase.from("profiles").insert({ ...payload, user_id: user.id });
     setSaving(false);
-    if (error) return toast.error("Could not save your profile");
+    if (error) {
+      toast.error("Could not save your profile");
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["my-profile"] });
     toast.success(isNew ? "Welcome to Ember!" : "Profile saved");
     if (isNew) navigate({ to: "/discover" });

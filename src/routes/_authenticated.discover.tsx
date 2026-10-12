@@ -68,7 +68,10 @@ function DiscoverPage() {
   async function resetPasses() {
     if (!me) return;
     const { error } = await supabase.from("swipes").delete().eq("swiper", me.id).eq("liked", false);
-    if (error) return toast.error("Could not reset");
+    if (error) {
+      toast.error("Could not reset");
+      return;
+    }
     setEpoch((n) => n + 1);
   }
 
@@ -140,7 +143,8 @@ function Deck({
       return;
     }
     if (liked) {
-      const [a, b] = [me.id, target.id].sort();
+      const a = me.id < target.id ? me.id : target.id;
+      const b = me.id < target.id ? target.id : me.id;
       const { data } = await supabase
         .from("matches")
         .select("id")

@@ -80,7 +80,10 @@ function ChatPage() {
     setSending(true);
     const { error } = await supabase.from("messages").insert({ match_id: matchId, sender: me.id, body });
     setSending(false);
-    if (error) return toast.error("Message not sent");
+    if (error) {
+      toast.error("Message not sent");
+      return;
+    }
     setText("");
     await qc.invalidateQueries({ queryKey: ["messages", matchId] });
     qc.invalidateQueries({ queryKey: ["matches"] });

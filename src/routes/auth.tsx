@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): { mode: "signin" | "signup" } => ({
-    mode: search.mode === "signup" ? "signup" : "signin",
+    mode: search["mode"] === "signup" ? "signup" : "signin",
   }),
   head: () => ({
     meta: [
