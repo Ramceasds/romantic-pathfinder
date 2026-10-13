@@ -1,9 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Sparkles } from "lucide-react";
+import { MessageCircle, Sparkles, Crown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { AmbientBackground } from "@/components/AmbientBackground";
+import { SubscriptionModal } from "@/components/SubscriptionModal";
+import { useSubscription } from "@/hooks/use-subscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import type { Profile } from "@/lib/profile";
@@ -31,6 +34,8 @@ function MatchesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: me } = useMyProfile(user?.id);
+  const { isSubscribed } = useSubscription();
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   const { data: rows, isLoading } = useQuery({
     queryKey: ["matches", me?.id],
@@ -115,6 +120,39 @@ function MatchesPage() {
         </div>
       ) : (
         <>
+          {/* Secret Admirers Gold Teaser Banner */}
+          <div
+            onClick={() => setSubscriptionModalOpen(true)}
+            className="mt-4 flex cursor-pointer items-center justify-between rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/10 p-3.5 shadow-soft transition-all hover:scale-[1.01] active:scale-[0.99]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-11 w-11 flex-none items-center justify-center overflow-hidden rounded-full border-2 border-amber-400 bg-amber-500/20 shadow-glow">
+                <Crown className="h-5 w-5 text-amber-500" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-foreground">Secret Admirers</h3>
+                  <span className="rounded-full bg-amber-500 px-1.5 py-0.2 text-[9px] font-bold text-white uppercase">
+                    GOLD
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground pt-0.5">
+                  {isSubscribed
+                    ? "See everyone who liked your profile"
+                    : "See who liked you with Ember Gold"}
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              className="h-8 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 px-3 text-xs font-bold text-white shadow-sm flex-none"
+            >
+              {isSubscribed ? "View" : "Unlock"}
+            </Button>
+          </div>
+
           {fresh.length > 0 && (
             <section className="mt-6">
               <h2 className="mb-3 font-sans text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -182,6 +220,12 @@ function MatchesPage() {
           )}
         </>
       )}
+
+      {/* Subscription Mode Paywall Modal */}
+      <SubscriptionModal
+        open={subscriptionModalOpen}
+        onOpenChange={setSubscriptionModalOpen}
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   Sliders,
   CheckCircle2,
   Lightbulb,
+  Crown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { ProfilePreviewDialog } from "@/components/ProfilePreviewDialog";
 import { AvatarPickerModal } from "@/components/AvatarPickerModal";
+import { SubscriptionModal } from "@/components/SubscriptionModal";
+import { useSubscription } from "@/hooks/use-subscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import {
@@ -99,6 +102,10 @@ function ProfilePage() {
   ]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Subscription State
+  const { isSubscribed, activePlanDetails } = useSubscription();
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   // Dialog States
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -232,6 +239,55 @@ function ProfilePage() {
             <Eye className="mr-1.5 h-3.5 w-3.5" /> Preview card
           </Button>
         </header>
+
+        {/* Ember Gold Membership Card */}
+        <section
+          onClick={() => setSubscriptionModalOpen(true)}
+          className={cn(
+            "group relative overflow-hidden rounded-3xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]",
+            isSubscribed
+              ? "border border-amber-400/60 bg-gradient-to-r from-amber-500/20 via-yellow-400/15 to-rose-500/20 shadow-glow"
+              : "border border-amber-400/40 bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/10 shadow-soft",
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-white shadow-glow">
+                <Crown className="h-6 w-6 fill-white/20" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-display text-base font-bold text-foreground">
+                    {isSubscribed ? "Ember Gold Member" : "Upgrade to Ember Gold"}
+                  </h3>
+                  {isSubscribed && (
+                    <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
+                      {activePlanDetails?.name ?? "Active"}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground pt-0.5">
+                  {isSubscribed
+                    ? "Unlimited Likes, Rewinds & Secret Admirers active"
+                    : "Weekly, Monthly or Yearly plans from $1.35/week"}
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              className={cn(
+                "rounded-full text-xs font-bold shadow-sm flex-none",
+                isSubscribed
+                  ? "bg-card text-foreground border border-amber-400/50 hover:bg-card/90"
+                  : "bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-glow",
+              )}
+            >
+              {isSubscribed ? "Manage" : "Upgrade"}
+            </Button>
+          </div>
+        </section>
 
         {/* Profile Strength Card */}
         <section className="rounded-3xl border border-white/60 bg-card/75 p-4 shadow-soft backdrop-blur-xl space-y-2.5">
@@ -578,6 +634,12 @@ function ProfilePage() {
         currentPhoto={photoPath}
         onSelectPhoto={(path) => setPhotoPath(path)}
         onTriggerFileUpload={() => fileRef.current?.click()}
+      />
+
+      {/* Subscription Mode Modal */}
+      <SubscriptionModal
+        open={subscriptionModalOpen}
+        onOpenChange={setSubscriptionModalOpen}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Flame, Heart, RotateCcw, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { Flame, Heart, RotateCcw, SlidersHorizontal, Sparkles, X, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
@@ -9,9 +9,12 @@ import { FilterSheet } from "@/components/FilterSheet";
 import { EmberLogo } from "@/components/EmberLogo";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { MatchCelebrationModal } from "@/components/MatchCelebrationModal";
+import { SubscriptionModal } from "@/components/SubscriptionModal";
+import { useSubscription } from "@/hooks/use-subscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { gendersFor, type Profile } from "@/lib/profile";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({
@@ -31,6 +34,8 @@ function DiscoverPage() {
   const { data: me } = useMyProfile(user?.id);
   const [epoch, setEpoch] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const { isSubscribed } = useSubscription();
+  const [subscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   const deckKey = me ? ["deck", me.id, me.interested_in, me.min_age, me.max_age, epoch] : ["deck"];
   const { data: profiles, isLoading } = useQuery({
@@ -85,15 +90,32 @@ function DiscoverPage() {
 
       <header className="mb-3 flex items-center justify-between">
         <EmberLogo size="sm" />
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-10 w-10 rounded-full border border-border/60 bg-card/80 shadow-soft backdrop-blur-md transition-all hover:bg-card hover:scale-105 active:scale-95"
-          onClick={() => setFiltersOpen(true)}
-          aria-label="Filters"
-        >
-          <SlidersHorizontal className="h-4.5 w-4.5 text-foreground/80" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSubscriptionModalOpen(true)}
+            className={cn(
+              "h-10 rounded-full px-3 text-xs font-bold transition-all shadow-soft backdrop-blur-md",
+              isSubscribed
+                ? "border-amber-400 bg-amber-500/15 text-amber-600 shadow-glow hover:bg-amber-500/25"
+                : "border-amber-400/50 bg-gradient-to-r from-amber-500/10 to-rose-500/10 text-amber-600 hover:bg-amber-500/20 active:scale-95",
+            )}
+          >
+            <Crown className="mr-1.5 h-4 w-4 fill-amber-500 text-amber-500" />
+            {isSubscribed ? "Gold" : "Get Gold"}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full border border-border/60 bg-card/80 shadow-soft backdrop-blur-md transition-all hover:bg-card hover:scale-105 active:scale-95"
+            onClick={() => setFiltersOpen(true)}
+            aria-label="Filters"
+          >
+            <SlidersHorizontal className="h-4.5 w-4.5 text-foreground/80" />
+          </Button>
+        </div>
       </header>
 
       {isLoading || !profiles ? (
@@ -119,6 +141,11 @@ function DiscoverPage() {
         profile={me}
         saving={saveFilters.isPending}
         onSave={(v) => saveFilters.mutate(v)}
+      />
+
+      <SubscriptionModal
+        open={subscriptionModalOpen}
+        onOpenChange={setSubscriptionModalOpen}
       />
     </div>
   );
