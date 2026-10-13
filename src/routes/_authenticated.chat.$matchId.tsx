@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Ban, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { SafetyMenu } from "@/components/SafetyMenu";
+import { OpenerAssistant } from "@/components/OpenerAssistant";
+import { sharedInterests } from "@/lib/discovery";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -28,6 +31,20 @@ function ChatPage() {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const [ideasOpen, setIdeasOpen] = useState<boolean | null>(null);
+
+  const { data: blocked = false } = useQuery({
+    queryKey: ["blocked-ids"],
+    enabled: !!me,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("blocked_profile_ids");
+      if (error) throw error;
+      return (data as string[] | null) ?? [];
+    },
+    select: (ids) => ids,
+  }).data && false ? { data: true } : { data: false };
 
   const { data: other } = useQuery({
     queryKey: ["chat-other", matchId, me?.id],
