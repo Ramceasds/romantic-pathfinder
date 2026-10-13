@@ -35,7 +35,7 @@ function ChatPage() {
   const navigate = useNavigate();
   const [ideasOpen, setIdeasOpen] = useState<boolean | null>(null);
 
-  const { data: blocked = false } = useQuery({
+  const { data: blockedIds = [] } = useQuery({
     queryKey: ["blocked-ids"],
     enabled: !!me,
     queryFn: async () => {
@@ -43,8 +43,7 @@ function ChatPage() {
       if (error) throw error;
       return (data as string[] | null) ?? [];
     },
-    select: (ids) => ids,
-  }).data && false ? { data: true } : { data: false };
+  });
 
   const { data: other } = useQuery({
     queryKey: ["chat-other", matchId, me?.id],
