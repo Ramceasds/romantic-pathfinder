@@ -125,6 +125,51 @@ export type Database = {
           },
         ]
       }
+      moderation_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          moderator: string
+          note: string
+          profile_id: string
+          report_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          moderator: string
+          note?: string
+          profile_id: string
+          report_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          moderator?: string
+          note?: string
+          profile_id?: string
+          report_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age: number
@@ -145,6 +190,7 @@ export type Database = {
           min_age: number
           photo_url: string | null
           sort_by_shared: boolean
+          suspended: boolean
           user_id: string | null
         }
         Insert: {
@@ -166,6 +212,7 @@ export type Database = {
           min_age?: number
           photo_url?: string | null
           sort_by_shared?: boolean
+          suspended?: boolean
           user_id?: string | null
         }
         Update: {
@@ -187,6 +234,7 @@ export type Database = {
           min_age?: number
           photo_url?: string | null
           sort_by_shared?: boolean
+          suspended?: boolean
           user_id?: string | null
         }
         Relationships: []
@@ -200,6 +248,7 @@ export type Database = {
           reason: string
           reported: string
           reporter: string
+          status: string
         }
         Insert: {
           created_at?: string
@@ -209,6 +258,7 @@ export type Database = {
           reason: string
           reported: string
           reporter: string
+          status?: string
         }
         Update: {
           created_at?: string
@@ -218,6 +268,7 @@ export type Database = {
           reason?: string
           reported?: string
           reporter?: string
+          status?: string
         }
         Relationships: [
           {
@@ -282,17 +333,44 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_exists: { Args: never; Returns: boolean }
       blocked_profile_ids: { Args: never; Returns: string[] }
+      claim_first_admin: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
       my_profile_id: { Args: never; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -419,6 +497,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
