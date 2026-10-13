@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Flame, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EmberLogo } from "@/components/EmberLogo";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
@@ -70,83 +72,117 @@ function AuthPage() {
 
   if (checkEmail) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center bg-gradient-warm px-6 text-center">
-        <h1 className="text-3xl font-semibold">Check your email</h1>
-        <p className="mt-3 text-muted-foreground">
-          We sent a confirmation link to <strong className="text-foreground">{email}</strong>. Tap it to
-          activate your account, then come back and sign in.
-        </p>
-        <Button asChild variant="ghost" className="mt-6">
-          <Link to="/auth" search={{ mode: "signin" }} onClick={() => setCheckEmail(false)}>
-            Back to sign in
-          </Link>
-        </Button>
+      <main className="relative mx-auto flex min-h-screen max-w-md flex-col items-center justify-center overflow-hidden bg-background px-6 text-center">
+        <AmbientBackground intensity="vibrant" />
+        <div className="relative z-10 w-full rounded-3xl border border-white/60 bg-card/80 p-8 shadow-card backdrop-blur-xl">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-romantic text-white shadow-glow">
+            <Sparkles className="h-7 w-7" />
+          </div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Check your email</h1>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            We sent a confirmation link to <strong className="text-foreground">{email}</strong>. Tap it to
+            activate your account, then come back and sign in.
+          </p>
+          <Button asChild variant="ghost" className="mt-6 w-full rounded-full border border-border/60 bg-card/80 text-sm">
+            <Link to="/auth" search={{ mode: "signin" }} onClick={() => setCheckEmail(false)}>
+              Back to sign in
+            </Link>
+          </Button>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col bg-gradient-warm px-6 pb-10 pt-6">
-      <Link to="/" className="mb-8 inline-flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-soft" aria-label="Back">
-        <ArrowLeft className="h-5 w-5" />
-      </Link>
-      <div className="mb-8 flex items-center gap-2">
-        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow">
-          <Flame className="h-5 w-5" />
-        </span>
-        <h1 className="text-3xl font-semibold">{isSignup ? "Join Ember" : "Welcome back"}</h1>
-      </div>
+    <main className="relative mx-auto flex min-h-screen max-w-md flex-col overflow-hidden bg-background px-6 pb-10 pt-6">
+      <AmbientBackground intensity="vibrant" />
 
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 rounded-2xl bg-card"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            required
-            minLength={6}
-            autoComplete={isSignup ? "new-password" : "current-password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-2xl bg-card"
-          />
-        </div>
-        <Button
-          type="submit"
-          disabled={busy}
-          size="lg"
-          className="h-14 w-full rounded-full bg-gradient-primary text-base shadow-glow"
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          to="/"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/80 shadow-soft backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+          aria-label="Back"
         >
-          {busy ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
-        </Button>
-      </form>
-
-      <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <EmberLogo size="sm" showText={false} />
       </div>
 
-      <Button type="button" variant="outline" size="lg" onClick={google} className="h-14 w-full rounded-full bg-card text-base">
-        Continue with Google
-      </Button>
+      <div className="mb-6 space-y-1">
+        <h1 className="font-display text-3xl font-bold tracking-tight">
+          {isSignup ? "Join Ember" : "Welcome back"}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {isSignup
+            ? "Create an account to start meeting new people"
+            : "Sign in to catch up with your matches"}
+        </p>
+      </div>
 
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <div className="relative z-10 rounded-[2rem] border border-white/60 bg-card/80 p-6 shadow-card backdrop-blur-xl">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-12 rounded-2xl border-border/60 bg-background/80 transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              required
+              minLength={6}
+              autoComplete={isSignup ? "new-password" : "current-password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-12 rounded-2xl border-border/60 bg-background/80 transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={busy}
+            size="lg"
+            className="h-13 w-full rounded-full bg-gradient-romantic text-base font-semibold text-white shadow-glow-strong transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
+            {busy ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
+          </Button>
+        </form>
+
+        <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+          <span className="h-px flex-1 bg-border/60" /> or <span className="h-px flex-1 bg-border/60" />
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={google}
+          className="h-12 w-full rounded-full border-border/60 bg-background/80 text-sm font-medium transition-all hover:bg-background hover:scale-[1.01] active:scale-[0.99]"
+        >
+          Continue with Google
+        </Button>
+      </div>
+
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         {isSignup ? "Already have an account?" : "New here?"}{" "}
         <Link
           to="/auth"
           search={{ mode: isSignup ? "signin" : "signup" }}
-          className="font-semibold text-primary"
+          className="font-semibold text-primary underline-offset-4 hover:underline"
         >
           {isSignup ? "Sign in" : "Create an account"}
         </Link>

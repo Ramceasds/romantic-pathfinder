@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Flame, Heart, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { Flame, Heart, RotateCcw, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
 import { FilterSheet } from "@/components/FilterSheet";
-import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { EmberLogo } from "@/components/EmberLogo";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { MatchCelebrationModal } from "@/components/MatchCelebrationModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { gendersFor, type Profile } from "@/lib/profile";
@@ -78,22 +80,28 @@ function DiscoverPage() {
   if (!me) return null;
 
   return (
-    <div className="flex h-full flex-col px-4 pb-4 pt-5">
-      <header className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
-            <Flame className="h-5 w-5" />
-          </span>
-          <span className="font-display text-2xl font-semibold">Ember</span>
-        </div>
-        <Button variant="outline" size="icon" className="h-10 w-10 rounded-full bg-card" onClick={() => setFiltersOpen(true)} aria-label="Filters">
-          <SlidersHorizontal className="h-5 w-5" />
+    <div className="relative flex h-full flex-col px-4 pb-4 pt-4 overflow-hidden">
+      <AmbientBackground intensity="subtle" />
+
+      <header className="mb-3 flex items-center justify-between">
+        <EmberLogo size="sm" />
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 rounded-full border border-border/60 bg-card/80 shadow-soft backdrop-blur-md transition-all hover:bg-card hover:scale-105 active:scale-95"
+          onClick={() => setFiltersOpen(true)}
+          aria-label="Filters"
+        >
+          <SlidersHorizontal className="h-4.5 w-4.5 text-foreground/80" />
         </Button>
       </header>
 
       {isLoading || !profiles ? (
         <div className="flex flex-1 items-center justify-center">
-          <Flame className="h-8 w-8 animate-pulse text-primary" />
+          <div className="relative flex items-center justify-center">
+            <div className="absolute h-16 w-16 rounded-full bg-primary/20 blur-xl animate-pulse" />
+            <Flame className="h-10 w-10 animate-bounce text-primary" />
+          </div>
         </div>
       ) : (
         <Deck
@@ -171,20 +179,32 @@ function Deck({
 
   if (!current) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-accent text-accent-foreground">
-          <Heart className="h-9 w-9" />
-        </span>
-        <h2 className="text-2xl font-semibold">You're all caught up</h2>
-        <p className="max-w-[16rem] text-sm text-muted-foreground">
-          No more profiles match your filters right now. Widen them or bring back the people you passed on.
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center px-4">
+        <div className="relative flex items-center justify-center">
+          <div className="absolute h-24 w-24 rounded-full bg-primary/20 blur-xl animate-pulse" />
+          <span className="relative flex h-20 w-20 items-center justify-center rounded-full border border-primary/25 bg-gradient-to-tr from-primary/10 via-rose-500/15 to-amber-400/10 text-primary shadow-soft backdrop-blur-md">
+            <Heart className="h-9 w-9 fill-primary/20" />
+          </span>
+        </div>
+        <h2 className="font-display text-2xl font-bold tracking-tight">You're all caught up</h2>
+        <p className="max-w-[17rem] text-sm text-muted-foreground leading-relaxed">
+          No more profiles match your filters right now. Widen your range or give passed profiles another look.
         </p>
-        <div className="flex flex-col gap-2">
-          <Button onClick={onOpenFilters} className="rounded-full bg-gradient-primary px-6 shadow-glow">
-            Change filters
+        <div className="flex flex-col gap-2.5 pt-2 w-full max-w-xs">
+          <Button
+            onClick={onOpenFilters}
+            className="h-12 rounded-full bg-gradient-romantic text-base font-semibold shadow-glow-strong hover:scale-[1.02] active:scale-[0.98] transition-transform"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Adjust filters
           </Button>
-          <Button variant="ghost" onClick={onReset} className="rounded-full">
-            <RotateCcw className="mr-2 h-4 w-4" /> Show passed profiles again
+          <Button
+            variant="ghost"
+            onClick={onReset}
+            className="h-11 rounded-full border border-border/50 bg-card/60 text-sm backdrop-blur-md hover:bg-card"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Show passed profiles again
           </Button>
         </div>
       </div>
@@ -195,52 +215,42 @@ function Deck({
     <>
       <div className="relative min-h-0 flex-1">
         {next && (
-          <div className="absolute inset-0 scale-95 opacity-80">
+          <div className="absolute inset-0 scale-[0.94] translate-y-2 opacity-75 blur-[0.3px] transition-all duration-300">
             <SwipeCard key={next.id} profile={next} interactive={false} fly={null} onDecide={() => {}} />
           </div>
         )}
         <SwipeCard key={current.id} profile={current} interactive fly={fly} onDecide={decide} />
       </div>
 
-      <div className="flex items-center justify-center gap-8 pt-5">
+      {/* Tactile Action Button Deck */}
+      <div className="flex items-center justify-center gap-7 pt-4 pb-1">
+        {/* Pass Button */}
         <button
           onClick={() => decide(false)}
           aria-label="Pass"
-          className="flex h-16 w-16 items-center justify-center rounded-full border bg-card text-pass shadow-soft transition-transform active:scale-90"
+          className="group relative flex h-16 w-16 items-center justify-center rounded-full border border-rose-200/60 bg-card/90 text-rose-500 shadow-soft backdrop-blur-md transition-all duration-200 hover:scale-110 hover:border-rose-400 hover:bg-rose-50/50 hover:shadow-md active:scale-90"
         >
-          <X className="h-8 w-8" strokeWidth={3} />
+          <X className="h-7 w-7 stroke-[2.8] transition-transform group-hover:rotate-12" />
         </button>
+
+        {/* Like Button */}
         <button
           onClick={() => decide(true)}
           aria-label="Like"
-          className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow transition-transform active:scale-90"
+          className="group relative flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gradient-romantic text-white shadow-glow-strong transition-all duration-200 hover:scale-110 hover:shadow-[0_0_35px_rgba(244,63,94,0.6)] active:scale-90"
         >
-          <Heart className="h-9 w-9 fill-current" />
+          <Heart className="h-9 w-9 fill-current transition-transform group-hover:scale-110 group-hover:animate-heartbeat" />
         </button>
       </div>
 
+      {/* Full Celebration Modal */}
       {match && (
-        <div className="fixed inset-0 z-50 mx-auto flex max-w-md flex-col items-center justify-center gap-6 bg-gradient-primary px-8 text-center text-primary-foreground">
-          <h2 className="font-display text-5xl font-semibold">It's a match!</h2>
-          <p className="opacity-90">You and {match.profile.display_name} liked each other.</p>
-          <div className="flex items-center">
-            <ProfilePhoto path={me.photo_url} name={me.display_name} className="h-32 w-32 -rotate-6 rounded-full border-4 border-primary-foreground" />
-            <ProfilePhoto path={match.profile.photo_url} name={match.profile.display_name} className="-ml-6 h-32 w-32 rotate-6 rounded-full border-4 border-primary-foreground" />
-          </div>
-          <div className="mt-4 w-full space-y-3">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="h-14 w-full rounded-full text-base"
-              onClick={() => navigate({ to: "/chat/$matchId", params: { matchId: match.matchId } })}
-            >
-              Send a message
-            </Button>
-            <Button size="lg" variant="ghost" className="w-full rounded-full text-base text-primary-foreground hover:bg-card/20 hover:text-primary-foreground" onClick={() => setMatch(null)}>
-              Keep swiping
-            </Button>
-          </div>
-        </div>
+        <MatchCelebrationModal
+          me={me}
+          matchedProfile={match.profile}
+          onSendMessage={() => navigate({ to: "/chat/$matchId", params: { matchId: match.matchId } })}
+          onKeepSwiping={() => setMatch(null)}
+        />
       )}
     </>
   );

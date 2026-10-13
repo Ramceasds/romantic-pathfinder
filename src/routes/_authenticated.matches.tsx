@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Sparkles } from "lucide-react";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import type { Profile } from "@/lib/profile";
@@ -85,32 +86,58 @@ function MatchesPage() {
     .sort((a, b) => b.last!.created_at.localeCompare(a.last!.created_at));
 
   return (
-    <div className="px-5 pb-6 pt-8">
-      <h1 className="text-3xl font-semibold">Chats</h1>
+    <div className="relative min-h-full px-5 pb-8 pt-6 overflow-hidden">
+      <AmbientBackground intensity="subtle" />
+
+      <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
+        Chats & Matches
+      </h1>
 
       {isLoading ? null : !rows?.length ? (
-        <div className="mt-24 flex flex-col items-center gap-3 text-center">
-          <span className="flex h-20 w-20 items-center justify-center rounded-full bg-accent text-accent-foreground">
-            <MessageCircle className="h-9 w-9" />
-          </span>
-          <h2 className="text-xl font-semibold">No matches yet</h2>
-          <p className="max-w-[15rem] text-sm text-muted-foreground">
-            Keep swiping — when someone likes you back, they will show up here.
+        <div className="mt-20 flex flex-col items-center gap-3 text-center px-4">
+          <div className="relative flex items-center justify-center">
+            <div className="absolute h-24 w-24 rounded-full bg-primary/20 blur-xl animate-pulse" />
+            <span className="relative flex h-20 w-20 items-center justify-center rounded-full border border-primary/25 bg-gradient-to-tr from-primary/10 via-rose-500/15 to-amber-400/10 text-primary shadow-soft backdrop-blur-md">
+              <MessageCircle className="h-9 w-9" />
+            </span>
+          </div>
+          <h2 className="font-display text-2xl font-bold tracking-tight">No matches yet</h2>
+          <p className="max-w-[16rem] text-sm text-muted-foreground leading-relaxed">
+            Keep discovering profiles — when mutual interest sparks, your conversations will appear here.
           </p>
-          <Link to="/discover" className="mt-2 rounded-full bg-gradient-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow">
-            Go to Discover
+          <Link
+            to="/discover"
+            className="mt-3 inline-flex items-center gap-2 rounded-full bg-gradient-romantic px-6 py-3 text-sm font-semibold text-white shadow-glow-strong transition-transform hover:scale-105 active:scale-95"
+          >
+            <Sparkles className="h-4 w-4" />
+            Discover people
           </Link>
         </div>
       ) : (
         <>
           {fresh.length > 0 && (
             <section className="mt-6">
-              <h2 className="mb-3 font-sans text-sm font-semibold uppercase tracking-wider text-muted-foreground">New matches</h2>
-              <div className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-2">
+              <h2 className="mb-3 font-sans text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                New matches ({fresh.length})
+              </h2>
+              <div className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-3 pt-1 no-scrollbar">
                 {fresh.map((r) => (
-                  <Link key={r.matchId} to="/chat/$matchId" params={{ matchId: r.matchId }} className="flex w-20 flex-none flex-col items-center gap-2">
-                    <ProfilePhoto path={r.other.photo_url} name={r.other.display_name} className="h-20 w-20 rounded-full border-2 border-primary" />
-                    <span className="max-w-full truncate text-sm font-medium">{r.other.display_name}</span>
+                  <Link
+                    key={r.matchId}
+                    to="/chat/$matchId"
+                    params={{ matchId: r.matchId }}
+                    className="group flex w-20 flex-none flex-col items-center gap-2 transition-transform hover:scale-105 active:scale-95"
+                  >
+                    <div className="rounded-full p-[2.5px] bg-gradient-to-tr from-rose-500 via-primary to-amber-400 shadow-glow transition-all duration-300 group-hover:shadow-glow-strong">
+                      <ProfilePhoto
+                        path={r.other.photo_url}
+                        name={r.other.display_name}
+                        className="h-18 w-18 rounded-full border-2 border-background object-cover"
+                      />
+                    </div>
+                    <span className="max-w-full truncate text-xs font-semibold text-foreground/90">
+                      {r.other.display_name}
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -119,15 +146,30 @@ function MatchesPage() {
 
           {chats.length > 0 && (
             <section className="mt-6">
-              <h2 className="mb-3 font-sans text-sm font-semibold uppercase tracking-wider text-muted-foreground">Messages</h2>
-              <ul className="space-y-1">
+              <h2 className="mb-3 font-sans text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Recent conversations
+              </h2>
+              <ul className="space-y-2">
                 {chats.map((r) => (
                   <li key={r.matchId}>
-                    <Link to="/chat/$matchId" params={{ matchId: r.matchId }} className="flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-muted">
-                      <ProfilePhoto path={r.other.photo_url} name={r.other.display_name} className="h-14 w-14 flex-none rounded-full" />
-                      <div className="min-w-0">
-                        <p className="font-semibold">{r.other.display_name}</p>
-                        <p className="truncate text-sm text-muted-foreground">
+                    <Link
+                      to="/chat/$matchId"
+                      params={{ matchId: r.matchId }}
+                      className="group flex items-center gap-3.5 rounded-2xl border border-border/40 bg-card/60 p-3 shadow-soft backdrop-blur-md transition-all duration-200 hover:border-primary/30 hover:bg-card/90 hover:shadow-md"
+                    >
+                      <div className="relative flex-none">
+                        <ProfilePhoto
+                          path={r.other.photo_url}
+                          name={r.other.display_name}
+                          className="h-14 w-14 rounded-full border border-border/60 object-cover"
+                        />
+                        <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-card bg-emerald-500 shadow-sm" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
+                          {r.other.display_name}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground pt-0.5">
                           {r.last!.sender === me?.id ? "You: " : ""}
                           {r.last!.body}
                         </p>

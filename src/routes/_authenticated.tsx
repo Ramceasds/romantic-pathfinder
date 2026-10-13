@@ -49,7 +49,10 @@ function AuthenticatedLayout() {
         <Outlet />
       </div>
       {!hideNav && (
-        <nav className="flex border-t bg-card pb-[env(safe-area-inset-bottom)]" aria-label="Main">
+        <nav
+          className="flex border-t border-border/50 bg-card/85 backdrop-blur-xl shadow-[0_-8px_24px_-4px_rgba(0,0,0,0.06)] px-3 py-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
+          aria-label="Main"
+        >
           {tabs.map(({ to, label, icon: Icon }) => {
             const active = pathname.startsWith(to);
             return (
@@ -57,12 +60,22 @@ function AuthenticatedLayout() {
                 key={to}
                 to={to}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-1 py-3 text-xs font-medium transition-colors",
-                  active ? "text-primary" : "text-muted-foreground",
+                  "relative flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1.5 text-xs font-semibold transition-all duration-200",
+                  active
+                    ? "text-primary scale-105"
+                    : "text-muted-foreground hover:text-foreground active:scale-95",
                 )}
               >
-                <Icon className={cn("h-6 w-6", active && "fill-primary/15")} />
-                {label}
+                {active && (
+                  <span className="absolute inset-0 -z-10 rounded-2xl bg-primary/10 backdrop-blur-md" />
+                )}
+                <Icon
+                  className={cn(
+                    "h-5 w-5 transition-transform duration-200",
+                    active && "fill-primary/20 scale-110",
+                  )}
+                />
+                <span>{label}</span>
               </Link>
             );
           })}
