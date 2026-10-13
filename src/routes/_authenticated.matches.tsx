@@ -35,11 +35,13 @@ function MatchesPage() {
     queryKey: ["matches", me?.id],
     enabled: !!me,
     queryFn: async (): Promise<Row[]> => {
-      const { data: matches, error } = await supabase
-        .from("matches")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const [{ data: all, error }, { data: blocked }] = await Promise.all([
+        supabase.from("matches").select("*").order("created_at", { ascending: false }),
+        supabase.rpc("blocked_profile_ids"),
+      ]);
       if (error) throw error;
+      const hidden = new Set((blocked as string[] | null) ?? []);
+      const matches = all.filter((m) => !hidden.has(m.profile_a === me!.id ? m.profile_b : m.profile_a));
       if (!matches.length) return [];
       const otherIds = matches.map((m) => (m.profile_a === me!.id ? m.profile_b : m.profile_a));
       const [{ data: profs }, { data: msgs }] = await Promise.all([

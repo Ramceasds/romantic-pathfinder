@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocks: {
+        Row: {
+          blocked: string
+          blocker: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked: string
+          blocker: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked?: string
+          blocker?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocks_blocked_fkey"
+            columns: ["blocked"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocks_blocker_fkey"
+            columns: ["blocker"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string
@@ -96,14 +132,19 @@ export type Database = {
           city: string
           created_at: string
           display_name: string
+          filter_interests: string[]
           gender: string
           id: string
           interested_in: string
           interests: string[]
           is_demo: boolean
+          latitude: number | null
+          longitude: number | null
           max_age: number
+          max_distance_km: number
           min_age: number
           photo_url: string | null
+          sort_by_shared: boolean
           user_id: string | null
         }
         Insert: {
@@ -112,14 +153,19 @@ export type Database = {
           city?: string
           created_at?: string
           display_name: string
+          filter_interests?: string[]
           gender?: string
           id?: string
           interested_in?: string
           interests?: string[]
           is_demo?: boolean
+          latitude?: number | null
+          longitude?: number | null
           max_age?: number
+          max_distance_km?: number
           min_age?: number
           photo_url?: string | null
+          sort_by_shared?: boolean
           user_id?: string | null
         }
         Update: {
@@ -128,17 +174,74 @@ export type Database = {
           city?: string
           created_at?: string
           display_name?: string
+          filter_interests?: string[]
           gender?: string
           id?: string
           interested_in?: string
           interests?: string[]
           is_demo?: boolean
+          latitude?: number | null
+          longitude?: number | null
           max_age?: number
+          max_distance_km?: number
           min_age?: number
           photo_url?: string | null
+          sort_by_shared?: boolean
           user_id?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          match_id: string | null
+          reason: string
+          reported: string
+          reporter: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string
+          id?: string
+          match_id?: string | null
+          reason: string
+          reported: string
+          reporter: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          match_id?: string | null
+          reason?: string
+          reported?: string
+          reporter?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reported_fkey"
+            columns: ["reported"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_fkey"
+            columns: ["reporter"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       swipes: {
         Row: {
@@ -184,6 +287,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      blocked_profile_ids: { Args: never; Returns: string[] }
+      is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
       my_profile_id: { Args: never; Returns: string }
     }
     Enums: {

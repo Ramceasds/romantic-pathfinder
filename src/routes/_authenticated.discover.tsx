@@ -5,7 +5,9 @@ import { Flame, Heart, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SwipeCard } from "@/components/SwipeCard";
-import { FilterSheet } from "@/components/FilterSheet";
+import { FilterSheet, type FilterValues } from "@/components/FilterSheet";
+import { SafetyMenu } from "@/components/SafetyMenu";
+import { rankCandidates, type Candidate } from "@/lib/discovery";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
@@ -30,16 +32,22 @@ function DiscoverPage() {
   const [epoch, setEpoch] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const deckKey = me ? ["deck", me.id, me.interested_in, me.min_age, me.max_age, epoch] : ["deck"];
+  const deckKey = me
+    ? ["deck", me.id, me.interested_in, me.min_age, me.max_age, me.max_distance_km, me.latitude, me.longitude, me.filter_interests.join(","), me.sort_by_shared, epoch]
+    : ["deck"];
   const { data: profiles, isLoading } = useQuery({
     queryKey: deckKey,
     enabled: !!me,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
-    queryFn: async (): Promise<Profile[]> => {
-      const { data: swiped, error: e1 } = await supabase.from("swipes").select("target").eq("swiper", me!.id);
+    queryFn: async (): Promise<Candidate[]> => {
+      const [{ data: swiped, error: e1 }, { data: blocked, error: e3 }] = await Promise.all([
+        supabase.from("swipes").select("target").eq("swiper", me!.id),
+        supabase.rpc("blocked_profile_ids"),
+      ]);
       if (e1) throw e1;
-      const exclude = [me!.id, ...(swiped ?? []).map((s) => s.target)];
+      if (e3) throw e3;
+      const exclude = [me!.id, ...(swiped ?? []).map((s) => s.target), ...((blocked as string[] | null) ?? [])];
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -47,14 +55,14 @@ function DiscoverPage() {
         .in("gender", gendersFor(me!.interested_in))
         .gte("age", me!.min_age)
         .lte("age", me!.max_age)
-        .limit(40);
+        .limit(300);
       if (error) throw error;
-      return data;
+      return rankCandidates(me!, data).slice(0, 60);
     },
   });
 
   const saveFilters = useMutation({
-    mutationFn: async (v: { interested_in: string; min_age: number; max_age: number }) => {
+    mutationFn: async (v: FilterValues) => {
       const { error } = await supabase.from("profiles").update(v).eq("id", me!.id);
       if (error) throw error;
     },
@@ -75,6 +83,22 @@ function DiscoverPage() {
     setEpoch((n) => n + 1);
   }
 
+  const { data: suggestions = [] } = useQuery({
+    queryKey: ["interest-suggestions"],
+    enabled: !!me,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("interests").limit(200);
+      const count = new Map<string, number>();
+      for (const r of data ?? []) for (const i of r.interests) count.set(i, (count.get(i) ?? 0) + 1);
+      return [...count.entries()].sort((a, b) => b[1] - a[1]).map(([i]) => i);
+    },
+  });
+
+  const activeFilters = me
+    ? (me.max_distance_km < 500 && me.latitude != null ? 1 : 0) + (me.filter_interests.length ? 1 : 0) + (me.interested_in !== "everyone" ? 1 : 0)
+    : 0;
+
   if (!me) return null;
 
   return (
@@ -86,8 +110,13 @@ function DiscoverPage() {
           </span>
           <span className="font-display text-2xl font-semibold">Ember</span>
         </div>
-        <Button variant="outline" size="icon" className="h-10 w-10 rounded-full bg-card" onClick={() => setFiltersOpen(true)} aria-label="Filters">
+        <Button variant="outline" size="icon" className="relative h-10 w-10 rounded-full bg-card" onClick={() => setFiltersOpen(true)} aria-label="Filters">
           <SlidersHorizontal className="h-5 w-5" />
+          {activeFilters > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[0.7rem] font-bold text-primary-foreground">
+              {activeFilters}
+            </span>
+          )}
         </Button>
       </header>
 
@@ -109,6 +138,7 @@ function DiscoverPage() {
         open={filtersOpen}
         onOpenChange={setFiltersOpen}
         profile={me}
+        suggestions={suggestions}
         saving={saveFilters.isPending}
         onSave={(v) => saveFilters.mutate(v)}
       />
@@ -122,7 +152,7 @@ function Deck({
   onReset,
   onOpenFilters,
 }: {
-  profiles: Profile[];
+  profiles: Candidate[];
   me: Profile;
   onReset: () => void;
   onOpenFilters: () => void;
@@ -130,11 +160,13 @@ function Deck({
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [idx, setIdx] = useState(0);
+  const [hidden, setHidden] = useState<string[]>([]);
+  const visible = profiles.filter((p) => !hidden.includes(p.id));
   const [fly, setFly] = useState<"like" | "pass" | null>(null);
   const [match, setMatch] = useState<{ profile: Profile; matchId: string } | null>(null);
 
-  const current = profiles[idx];
-  const next = profiles[idx + 1];
+  const current = visible[idx];
+  const next = visible[idx + 1];
 
   async function commit(target: Profile, liked: boolean) {
     const { error } = await supabase.from("swipes").insert({ swiper: me.id, target: target.id, liked });
@@ -200,6 +232,16 @@ function Deck({
           </div>
         )}
         <SwipeCard key={current.id} profile={current} interactive fly={fly} onDecide={decide} />
+        {!fly && (
+          <div className="absolute right-4 top-4 z-10">
+            <SafetyMenu
+              meId={me.id}
+              target={current}
+              onBlocked={() => setHidden((h) => [...h, current.id])}
+              triggerClassName="bg-foreground/30 text-primary-foreground backdrop-blur"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-8 pt-5">

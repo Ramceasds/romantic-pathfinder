@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import type { Profile } from "@/lib/profile";
+import { formatDistance } from "@/lib/discovery";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  profile: Profile;
+  profile: Profile & { distance?: number | null; shared?: string[] };
   interactive: boolean;
   /** Set by the parent when a swipe is triggered by a button. */
   fly: "like" | "pass" | null;
@@ -78,16 +79,30 @@ export function SwipeCard({ profile, interactive, fly, onDecide }: Props) {
         <h2 className="font-display text-3xl font-semibold">
           {profile.display_name}, {profile.age}
         </h2>
-        {profile.city && (
+        {(profile.city || profile.distance != null) && (
           <p className="flex items-center gap-1 text-sm opacity-90">
-            <MapPin className="h-4 w-4" /> {profile.city}
+            <MapPin className="h-4 w-4" /> {[profile.city, formatDistance(profile.distance ?? null)].filter(Boolean).join(" · ")}
+          </p>
+        )}
+        {!!profile.shared?.length && (
+          <p className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold">
+            ✦ {profile.shared.length} in common
           </p>
         )}
         {profile.bio && <p className="line-clamp-2 text-sm opacity-95">{profile.bio}</p>}
         {profile.interests.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {profile.interests.slice(0, 4).map((i) => (
-              <span key={i} className="rounded-full bg-card/25 px-2.5 py-1 text-xs font-medium backdrop-blur">
+            {[...profile.interests]
+              .sort((a, b) => Number(!!profile.shared?.includes(b)) - Number(!!profile.shared?.includes(a)))
+              .slice(0, 5)
+              .map((i) => (
+              <span
+                key={i}
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur",
+                  profile.shared?.includes(i) ? "bg-card text-primary" : "bg-card/25",
+                )}
+              >
                 {i}
               </span>
             ))}

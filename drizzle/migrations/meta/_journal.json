@@ -15,6 +15,20 @@
       "when": 1791788432957,
       "tag": "0001_avatars_private_read",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791895737090,
+      "tag": "0002_discovery_filters",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791895787798,
+      "tag": "0003_blocks_reports",
+      "breakpoints": true
     }
   ]
 }
