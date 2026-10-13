@@ -96,7 +96,7 @@ function DiscoverPage() {
             size="sm"
             onClick={() => setSubscriptionModalOpen(true)}
             className={cn(
-              "h-10 rounded-full px-3 text-xs font-bold transition-all shadow-soft backdrop-blur-md",
+              "h-11 rounded-full px-3 text-xs font-bold transition-all shadow-soft backdrop-blur-md",
               isSubscribed
                 ? "border-amber-400 bg-amber-500/15 text-amber-600 shadow-glow hover:bg-amber-500/25"
                 : "border-amber-400/50 bg-gradient-to-r from-amber-500/10 to-rose-500/10 text-amber-600 hover:bg-amber-500/20 active:scale-95",
@@ -108,12 +108,13 @@ function DiscoverPage() {
 
           <Button
             variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full border border-border/60 bg-card/80 shadow-soft backdrop-blur-md transition-all hover:bg-card hover:scale-105 active:scale-95"
+            size="sm"
+            className="h-11 rounded-full border border-border/60 bg-card/80 px-3 shadow-soft backdrop-blur-md transition-all hover:bg-card active:scale-95"
             onClick={() => setFiltersOpen(true)}
             aria-label="Filters"
           >
-            <SlidersHorizontal className="h-4.5 w-4.5 text-foreground/80" />
+            <SlidersHorizontal className="h-4 w-4 text-foreground/80" />
+            <span className="ml-1.5 text-xs font-semibold">Filters</span>
           </Button>
         </div>
       </header>
@@ -249,24 +250,25 @@ function Deck({
         <SwipeCard key={current.id} profile={current} interactive fly={fly} onDecide={decide} />
       </div>
 
-      {/* Tactile Action Button Deck */}
-      <div className="flex items-center justify-center gap-7 pt-4 pb-1">
-        {/* Pass Button */}
+      <div className="flex items-center justify-center gap-3 pt-3 pb-1">
         <button
+          type="button"
           onClick={() => decide(false)}
-          aria-label="Pass"
-          className="group relative flex h-16 w-16 items-center justify-center rounded-full border border-rose-200/60 bg-card/90 text-rose-500 shadow-soft backdrop-blur-md transition-all duration-200 hover:scale-110 hover:border-rose-400 hover:bg-rose-50/50 hover:shadow-md active:scale-90"
+          aria-label="Pass on this profile"
+          className="group flex h-12 min-w-32 items-center justify-center gap-2 rounded-full border border-border/70 bg-card/90 px-5 text-sm font-semibold text-foreground shadow-soft backdrop-blur-md transition-all hover:border-rose-300 hover:bg-rose-50/70 hover:text-rose-600 active:scale-[0.97]"
         >
-          <X className="h-7 w-7 stroke-[2.8] transition-transform group-hover:rotate-12" />
+          <X className="h-4.5 w-4.5 text-rose-500 transition-transform group-hover:rotate-12" />
+          Pass
         </button>
 
-        {/* Like Button */}
         <button
+          type="button"
           onClick={() => decide(true)}
-          aria-label="Like"
-          className="group relative flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gradient-romantic text-white shadow-glow-strong transition-all duration-200 hover:scale-110 hover:shadow-[0_0_35px_rgba(244,63,94,0.6)] active:scale-90"
+          aria-label="Like this profile"
+          className="group flex h-12 min-w-36 items-center justify-center gap-2 rounded-full bg-gradient-romantic px-6 text-sm font-semibold text-white shadow-glow-strong transition-all hover:-translate-y-0.5 hover:shadow-[0_0_35px_rgba(244,63,94,0.45)] active:translate-y-0 active:scale-[0.97]"
         >
-          <Heart className="h-9 w-9 fill-current transition-transform group-hover:scale-110 group-hover:animate-heartbeat" />
+          <Heart className="h-5 w-5 fill-current transition-transform group-hover:scale-110" />
+          Like
         </button>
       </div>
 
