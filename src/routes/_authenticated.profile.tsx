@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Camera, LogOut } from "lucide-react";
+import { Camera, LogOut, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-admin";
 import { GENDERS, INTERESTED_IN, parseInterests } from "@/lib/profile";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +62,7 @@ function ProfilePage() {
   const qc = useQueryClient();
   const { data: profile } = useMyProfile(user?.id);
   const isNew = !profile;
+  const { data: isAdmin } = useIsAdmin(user?.id);
 
   const [name, setName] = useState(profile?.display_name ?? "");
   const [age, setAge] = useState(profile ? String(profile.age) : "");
@@ -197,6 +199,12 @@ function ProfilePage() {
       <Button type="submit" size="lg" disabled={saving || uploading} className="h-14 w-full rounded-full bg-gradient-primary text-base shadow-glow">
         {saving ? "Saving…" : isNew ? "Start matching" : "Save changes"}
       </Button>
+
+      {isAdmin && (
+        <Link to="/admin" className="flex items-center justify-center gap-2 rounded-full border bg-card py-3 text-sm font-semibold text-primary">
+          <ShieldCheck className="h-4 w-4" /> Moderation dashboard
+        </Link>
+      )}
 
       {!isNew && (
         <Button type="button" variant="ghost" onClick={signOut} className="w-full text-muted-foreground">
