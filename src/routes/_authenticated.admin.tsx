@@ -281,8 +281,8 @@ function ReportDetail({
   onBack,
 }: {
   report: Report;
-  reported?: Profile;
-  reporter?: Profile;
+  reported: Profile | undefined;
+  reporter: Profile | undefined;
   priorReports: Report[];
   moderatorId: string;
   onBack: () => void;
