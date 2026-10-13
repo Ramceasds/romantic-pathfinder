@@ -32,7 +32,7 @@ export const generateOpeners = createServerFn({ method: "POST" })
     const describe = (p: typeof me) =>
       `Name: ${p.display_name}, age ${p.age}, city: ${p.city || "unknown"}. Bio: ${p.bio || "(none)"}. Interests: ${p.interests.join(", ") || "(none)"}.`;
 
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env["LOVABLE_API_KEY"];
     if (!key) return { error: "AI is not configured", openers: [] as string[] };
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
