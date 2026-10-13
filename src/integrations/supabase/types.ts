@@ -96,14 +96,19 @@ export type Database = {
           city: string
           created_at: string
           display_name: string
+          filter_interests: string[]
           gender: string
           id: string
           interested_in: string
           interests: string[]
           is_demo: boolean
+          latitude: number | null
+          longitude: number | null
           max_age: number
+          max_distance_km: number
           min_age: number
           photo_url: string | null
+          sort_by_shared: boolean
           user_id: string | null
         }
         Insert: {
@@ -112,14 +117,19 @@ export type Database = {
           city?: string
           created_at?: string
           display_name: string
+          filter_interests?: string[]
           gender?: string
           id?: string
           interested_in?: string
           interests?: string[]
           is_demo?: boolean
+          latitude?: number | null
+          longitude?: number | null
           max_age?: number
+          max_distance_km?: number
           min_age?: number
           photo_url?: string | null
+          sort_by_shared?: boolean
           user_id?: string | null
         }
         Update: {
@@ -128,14 +138,19 @@ export type Database = {
           city?: string
           created_at?: string
           display_name?: string
+          filter_interests?: string[]
           gender?: string
           id?: string
           interested_in?: string
           interests?: string[]
           is_demo?: boolean
+          latitude?: number | null
+          longitude?: number | null
           max_age?: number
+          max_distance_km?: number
           min_age?: number
           photo_url?: string | null
+          sort_by_shared?: boolean
           user_id?: string | null
         }
         Relationships: []
