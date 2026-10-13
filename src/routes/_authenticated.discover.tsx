@@ -52,6 +52,7 @@ function DiscoverPage() {
         .from("profiles")
         .select("*")
         .not("id", "in", `(${exclude.join(",")})`)
+        .eq("suspended", false)
         .in("gender", gendersFor(me!.interested_in))
         .gte("age", me!.min_age)
         .lte("age", me!.max_age)
