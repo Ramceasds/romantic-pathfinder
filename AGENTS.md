@@ -18,3 +18,5 @@
 - Discovery distance/interest filtering and ranking run client-side in `src/lib/discovery.ts` (tested); why: small deck, no PostGIS needed.
 - Blocks hide people both ways via the `blocked_profile_ids()` RPC, and message inserts are rejected by RLS when blocked; why: the blocked user can't read the blocks table.
 - AI icebreakers run in a `requireSupabaseAuth` server function that loads both profiles itself; why: never trust client-sent profile data.
+- Admin access uses `user_roles` + `has_role()`; the first account to call `claim_first_admin()` becomes admin. Why: bootstraps moderation without a hardcoded email.
+- Moderation actions are inserted rows; a trigger applies suspensions and report status. Why: one audit trail, and users can't change their own `suspended` flag.

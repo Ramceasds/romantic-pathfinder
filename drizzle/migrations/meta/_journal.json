@@ -29,6 +29,13 @@
       "when": 1791895787798,
       "tag": "0003_blocks_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791896113604,
+      "tag": "0004_moderation",
+      "breakpoints": true
     }
   ]
 }
