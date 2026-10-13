@@ -40,6 +40,14 @@ function AuthenticatedLayout() {
     );
   }
 
+  if (pathname.startsWith("/admin")) {
+    return (
+      <div className="min-h-[100dvh] bg-background">
+        <Outlet />
+      </div>
+    );
+  }
+
   const inChat = pathname.startsWith("/chat/");
   const hideNav = inChat || !profile;
 
