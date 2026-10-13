@@ -66,6 +66,13 @@ function AuthPage() {
     month: "short",
     day: "numeric",
   }).format(now);
+  const timeZoneLabel =
+    new Intl.DateTimeFormat(undefined, { timeZoneName: "short" })
+      .formatToParts(now)
+      .find((part) => part.type === "timeZoneName")?.value ?? "Local";
+  const hourAngle = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5;
+  const minuteAngle = now.getMinutes() * 6 + now.getSeconds() * 0.1;
+  const secondAngle = now.getSeconds() * 6;
 
   useEffect(() => {
     if (!loading && user && !isNewPassword) navigate({ to: "/discover", replace: true });
@@ -208,15 +215,41 @@ function AuthPage() {
         </Link>
         <div className="flex items-center gap-3">
           <EmberLogo size="sm" showText={false} />
-          <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card/75 px-3 py-2 shadow-soft backdrop-blur-md">
-            <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+          <div className="flex items-center gap-2.5 rounded-[1.35rem] border border-white/80 bg-gradient-to-br from-white/95 via-card/85 to-primary/10 px-2.5 py-2 shadow-[0_8px_22px_-12px_oklch(0.58_0.18_22_/_0.4)] ring-1 ring-primary/10 backdrop-blur-xl">
+            <div
+              className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/90 bg-gradient-to-br from-rose-50 via-white to-amber-100 shadow-[inset_0_1px_4px_rgba(255,255,255,0.95),0_3px_10px_rgba(232,93,105,0.16)]"
+              aria-hidden="true"
+            >
+              <span className="absolute inset-[4px] rounded-full border border-rose-200/80" />
+              <div
+                className="absolute inset-0"
+                style={{ transform: `rotate(${hourAngle}deg)`, transition: "transform 600ms linear" }}
+              >
+                <span className="absolute left-1/2 top-1/2 h-[10px] w-[2px] -translate-x-1/2 -translate-y-full rounded-full bg-foreground/80" />
+              </div>
+              <div
+                className="absolute inset-0"
+                style={{ transform: `rotate(${minuteAngle}deg)`, transition: "transform 600ms linear" }}
+              >
+                <span className="absolute left-1/2 top-1/2 h-[14px] w-[1.5px] -translate-x-1/2 -translate-y-full rounded-full bg-primary" />
+              </div>
+              <div
+                className="absolute inset-0"
+                style={{ transform: `rotate(${secondAngle}deg)`, transition: "transform 600ms linear" }}
+              >
+                <span className="absolute left-1/2 top-1/2 h-[16px] w-px -translate-x-1/2 -translate-y-full rounded-full bg-rose-500" />
+              </div>
+              <span className="relative h-1.5 w-1.5 rounded-full border border-white bg-rose-500 shadow-sm" />
+            </div>
             <time
               dateTime={now.toISOString()}
-              aria-label={`Local time ${timeLabel}, ${dateLabel}`}
-              className="min-w-[5.25rem] text-right tabular-nums"
+              aria-label={`Local time ${timeLabel}, ${dateLabel}, ${timeZoneLabel}`}
+              className="min-w-[5.5rem] text-right tabular-nums"
             >
-              <span className="block text-xs font-semibold text-foreground">{timeLabel}</span>
-              <span className="block text-[10px] leading-4 text-muted-foreground">{dateLabel}</span>
+              <span className="block text-xs font-bold tracking-tight text-foreground">{timeLabel}</span>
+              <span className="block text-[10px] font-medium leading-4 text-muted-foreground">
+                {dateLabel} <span aria-hidden="true">·</span> {timeZoneLabel}
+              </span>
             </time>
           </div>
         </div>
