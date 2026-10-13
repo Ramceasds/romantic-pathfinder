@@ -129,6 +129,62 @@ function Welcome() {
           </section>
         </div>
 
+        <section aria-labelledby="how-it-works" className="border-t border-border/60 py-14 sm:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> A more thoughtful way to meet
+            </span>
+            <h2 id="how-it-works" className="mt-5 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              Good connections start with a little curiosity.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+              Take your time, get a feel for someone, and make the first move when it feels right.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-3">
+            <article className="rounded-3xl border border-border/70 bg-card/75 p-6 shadow-soft backdrop-blur">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Users className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 font-display text-xl font-semibold">Make it yours</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Share the things you love and what you hope to find, so your profile feels like you.
+              </p>
+            </article>
+            <article className="rounded-3xl border border-border/70 bg-card/75 p-6 shadow-soft backdrop-blur">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <MapPin className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 font-display text-xl font-semibold">Explore at your pace</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Browse nearby profiles, follow what catches your attention, and skip anything that doesn’t.
+              </p>
+            </article>
+            <article className="rounded-3xl border border-border/70 bg-card/75 p-6 shadow-soft backdrop-blur">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 font-display text-xl font-semibold">Stay in control</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Your profile, your pace, your choice. Start a conversation only when you feel ready.
+              </p>
+            </article>
+          </div>
+
+          <div className="mx-auto mt-10 flex max-w-5xl flex-col items-center justify-between gap-5 rounded-3xl bg-gradient-warm p-6 text-center sm:flex-row sm:px-8 sm:text-left">
+            <div>
+              <p className="font-display text-xl font-semibold">Your next conversation could start here.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Create your profile in a few simple steps.</p>
+            </div>
+            <Button asChild className="group h-12 shrink-0 rounded-full bg-gradient-romantic px-6 font-semibold shadow-glow transition-all hover:-translate-y-0.5 hover:shadow-glow-strong">
+              <Link to="/auth" search={{ mode: "signup" }}>
+                Join Ember <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+
         <footer className="flex items-center justify-center pb-1 text-center text-[11px] text-muted-foreground/80">
           Your profile, your pace, your choice. &nbsp;·&nbsp; Be kind, stay curious.
         </footer>

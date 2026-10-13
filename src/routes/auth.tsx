@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,24 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const isSignup = mode === "signup";
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(now);
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  }).format(now);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/discover", replace: true });
@@ -105,7 +122,20 @@ function AuthPage() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <EmberLogo size="sm" showText={false} />
+        <div className="flex items-center gap-3">
+          <EmberLogo size="sm" showText={false} />
+          <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card/75 px-3 py-2 shadow-soft backdrop-blur-md">
+            <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+            <time
+              dateTime={now.toISOString()}
+              aria-label={`Local time ${timeLabel}, ${dateLabel}`}
+              className="min-w-[5.25rem] text-right tabular-nums"
+            >
+              <span className="block text-xs font-semibold text-foreground">{timeLabel}</span>
+              <span className="block text-[10px] leading-4 text-muted-foreground">{dateLabel}</span>
+            </time>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6 space-y-1">
